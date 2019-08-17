@@ -29,5 +29,5 @@ Feature: Login
     Given user logs in with following credentials
       | username | salesmanager101 |
       | password | UserUser123     |
-    Then user navigates to "Fleet" and "Vehicle Odometer"
-    And user verifies that "Vehicles Odometers" page name is displayed
+    Then user navigates to "Fleet" and "Vehicles"
+    And user verifies that "All Cars" page name is displayed

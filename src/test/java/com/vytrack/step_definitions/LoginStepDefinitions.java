@@ -62,6 +62,7 @@ public class LoginStepDefinitions {
 
     @Given("user logs in with following credentials")
     public void user_logs_in_with_following_credentials(Map<String, String> values) {
+        pages.loginPage().login(values.get("username"), values.get("password"));
 
     }
 
