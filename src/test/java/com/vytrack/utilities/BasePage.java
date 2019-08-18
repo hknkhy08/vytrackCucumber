@@ -22,12 +22,13 @@ public abstract class BasePage {
     @FindBy(css = "h1[class='oro-subtitle']")
     protected WebElement pageSubTitle;
 
+    @FindBy(css = "#user-menu > a")
+    protected WebElement userMenuName;
+
 
     public BasePage() {
         PageFactory.initElements(Driver.getDriver(), this);
     }
-
-
     /**
      * @return page name, for example: Dashboard
      */
@@ -37,8 +38,6 @@ public abstract class BasePage {
         BrowserUtils.waitForStaleElement(pageSubTitle);
         return pageSubTitle.getText();
     }
-
-
     /**
      * Waits until loader screen present. If loader screen will not pop up at all,
      * NoSuchElementException will be handled  bu try/catch block
@@ -48,12 +47,12 @@ public abstract class BasePage {
         try {
             WebDriverWait wait = new WebDriverWait(Driver.getDriver(), Integer.valueOf(ConfigurationReader.getProperty("SHORT_WAIT")));
             wait.until(ExpectedConditions.invisibilityOf(loaderMask));
+            logger.info("Loader mask gone...");
         } catch (Exception e) {
             logger.error("Loader mask doesn't present.");
-            System.out.println("Loader mask doesn't present.");
+            logger.error(e);
         }
     }
-
     /**
      * This method will navigate user to the specific module in vytrack application.
      * For example: if tab is equals to Activities, and module equals to Calls,
@@ -86,5 +85,13 @@ public abstract class BasePage {
             BrowserUtils.clickWithTimeOut(Driver.getDriver().findElement(By.xpath(moduleLocator)),  Integer.valueOf(ConfigurationReader.getProperty("SHORT_WAIT")));
         }
     }
+    public String getUserMenuName(){
+        waitUntilLoaderScreenDisappear();
+        return userMenuName.getText();
+    }
 
+    public String getPageTitle(){
+        waitUntilLoaderScreenDisappear();
+        return Driver.getDriver().getTitle();
+    }
 }
