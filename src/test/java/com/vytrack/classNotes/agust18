@@ -1,0 +1,133 @@
+        Agenda:
+                Data Driven Testing
+                Scenario Outline vs Scenario
+                Examples table
+        ######################################
+
+            Data tables: allows us to extend a test step and include large piece of data.
+            We can use List<E>, Map<Key, Value>,
+            List<Map<Key, Value>> and etc...
+        What is Data Driven Testing?
+            Testing approach that that allows to store test data separately from scripts into external files: excel files, csv files, json files. Cucumber allows you to perform data driven testing by storing test data in feature files. Thus, you can run same scripts with a different data sets. Test data has no impact on your code, because test data is not hard coded. We can do data driver testing in cucumber in 3 ways:
+                Parametrization of test steps
+                 Then user logs in with "wrong" username and "wrong" password
+                 Cucumber Data tables, that allows you to extend a test step and fit a lot test data under one test step.
+                 And user enters car information:
+                  | License Plate | Cybertek |
+                  | Driver        | Spartan  |
+                  | Location      | Alaska   |
+                  | Model Year    | 2019     |
+                  | Color         | Black    |
+                  | Power         | 500      |
+                  | Vehicle Make  | BMW      |
+                  | Vehicle Model | X5M      |
+                 Scenario Outline:  allows you to run same test with multiple data sets. Usually, people mention only Scenario Outline for DDT testing in cucumber. Whenever you have scenarios that follows exactly same pattern of steps, just with different input values or expected output you can use Scenario Outline.
+                 It has 2 components: Scenario itself and examples table.
+                    Scenario Outline: Login with different roles
+                        Given login as "<user>"
+                        When user verifies page name "Dashboard" is displayed
+                    Examples: user info
+                        |    user     |
+                        |driver       |
+                        |store manager|
+                        |sales manager|
+        As many rows you have in the examples table, as many times scenario outline will run. Except first line, that stands for parameter names.
+            What does mean hard coded?
+                it's when you test data like java variables, and in order to change it you need to modify code.
+        #######################
+            git stash save "my changes"
+            and then
+            git pull
+        ############
+        Data Driven Testing - we do, our framework is Hybrid, means combination of BDD, DDT, Page Object Model, and to be continue....
+        POM in maven - project object model.
+        POM as design pattern - Page Object Model.
+        In terms of BDD testing - we write tests from end-user perspective. For this, we use Cucumber BDD. Every test case works as scenario. All scenarios sores inside a feature file. Feature file written based on the user story from jira. Every user story has a same template: As user, I want to be able.....
+        BDT - Behavior Driven Testing
+        We don't do Test Driven Development because we are not developers, we are testers, regardless on title.
+        ######
+        Scenario - executes only once
+        Scenario Outline - executes multiple times.
+        Scenario Outline always followed by Examples table.
+        In Scenario Outline we create variables/placeholders and they match with column names from Examples table.
+        In Examples table, we have first row that is reserved for names for variables that we use in Scenario. They work like column names. When we are running test, cucumber will replace placeholder with value from Examples table.
+        Interview question: What the difference between Scenario and Scenario Outline?
+        How to do Data Driven Testing with cucumber?
+            Use scenario outline that allows to run same test with different data sets. Also cucumber data tables, allows you to store test data under test step in the feature file.
+            There is no wrong if LoginPage class will extend BasePage. But, I believe from design perspective, Login page doesn't have anything in common with pages that you after login.
+            How we found locator for loader screen/ overlay mask/ that grey spinning wheel?
+            At the beginning, we faced a lot of failures during any actions.
+            Whenever we've tried to click/enter text, selenium was throwing exception:
+            Click intercepted exception: other element received a click <div class="loader-mask"...>
+            Based on this exception, we find out locator for loader mask.
+            Now, in between navigation, we use method that waits until this loader screen disappears. We didn't inspect, just based on console output exception we built a locator.
+        !!!!!!!!!Use QA3 environment!!!!!
+        log4j is a logging framework/app/library that we use to log errors, or just to notify about some actions in the console output. Just think about log4j it's like a sysout but better, because has a lot of features. All you messages will be recorded in the txt file with date time stamp.
+        To make log4j work you need to do couple steps:
+        Add dependencies:
+            <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-api</artifactId>
+                    <version>2.12.0</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-core</artifactId>
+                    <version>2.12.0</version>
+                </dependency>
+        Then use need a config file for log4j. By default, it's looking for log4j2.xml file under src/main/resources.
+        <?xml version="1.0" encoding="UTF-8"?>
+        <Configuration status="WARN">
+            <Appenders>
+                <Console name="Console" target="SYSTEM_OUT">
+                    <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
+                </Console>
+                <RollingFile name="RollingFile" filename="log/automation.log"
+                             filepattern="${logPath}/%d{YYYYMMddHHmmss}-fargo.log">
+                    <PatternLayout pattern="%d{YYYY-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %msg%n"/>
+                    <Policies>
+                        <SizeBasedTriggeringPolicy size="100 MB"/>
+                    </Policies>
+                    <DefaultRolloverStrategy max="20"/>
+                </RollingFile>
+            </Appenders>
+            <Loggers>
+                <Root level="info">
+                    <AppenderRef ref="Console"/>
+                    <AppenderRef ref="RollingFile"/>
+                </Root>
+            </Loggers>
+        </Configuration>
+        Example of configuration.
+        Then we can create an object of logger to record something. It will also appear in console output with date time stamp.
+           private static final Logger logger = LogManager.getLogger();
+           logger.error() <-- to record some error in catch block (for example)
+            Methods that you can use with logger:
+             logger.trace(“Trace Message!“);
+             logger.debug(“Debug Message!“);
+             logger.info(“Info Message!“);
+             logger.warn(“Warn Message!“);
+             logger.error(“Error Message!“);
+             logger.fatal(“Fatal Message!“);
+             You can create logger in any class, or create a class Log under utils that will have logger object already. Also, you can make more custom logs.
+        Question: How to run only failed scenarios??
+            Cucumber can generate txt file with failed scenarios.
+            Then we can create a separate runner class that will run only failed scenarios.
+            <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.22.2</version>
+                        <configuration>
+                            <runOrder>alphabetical</runOrder>
+                            <includes>
+                                <include>**/FailedRunner.java</include>
+                                <include>**/CukesRunner.java</include>
+                            </includes>
+                            <testFailureIgnore>true</testFailureIgnore>
+                        </configuration>
+                    </plugin>
+        We have to runner classes:
+            main one: CukesRunner - that we usually use, and inside we have a plugin that will generate rerun.txt with failed scenarios. Then, we have FailedRunner that only runs rerun.txt file with failed scenarios.
+            How did we automate this process?
+            we need to run our tests from terminal, with a command: mvn clean verify.
+            MavenSureFire plugin will kick off CukesRunner and the FailedRunner that runs only failed scenarios.

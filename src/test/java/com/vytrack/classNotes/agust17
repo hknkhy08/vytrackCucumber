@@ -1,0 +1,235 @@
+        Agenda:
+                Data tables
+                - List
+                - Map
+                - List<Map<Key, Value>>
+
+        ##########################
+            Sometimes, we cannot fit data in one step:
+
+        When user logs in with "user" username and "pwd" password
+
+        Then user verifies that "Title" and "Start" and "End" and "RECURRENT" column name is displayed
+
+        Then user verifies that "Title" column name is displayed
+        Then user verifies that "Start" column name is displayed
+        Then user verifies that "End" column name is displayed
+        Then user verifies that "Recurrent" column name is displayed
+
+        Cucumber data table allows you to overcome issue with a big sets of data, or even when you cannot fir all data into step.
+
+        Cucumber data table allows you to extend a test step and include large piece of data into one step.
+
+        Scenario: Verify column names
+            Given user logs in as a store manager
+            When user navigates to "Activities" and "Calendar Events"
+            Then following table headers should be displayed
+                |   Title         |
+                |Calendar         |
+                |Start            |
+                |End              |
+                |Recurrent        |
+                |Recurrence       |
+                |Invitation Status|
+
+
+        Question: Should not it be from left to right not up-down?
+         It can be both.
+         |Values| <- as a List<String>
+         | abc  |
+
+         If you have 2 columns
+
+         |Key name | Value        |  <- Map<String, String>,
+         |User name|storemanager85|
+         |Password |UserUser123   |
+
+        Only 2 columns for a map.
+        Key on the left, value on the right
+
+
+         If you have more than one column
+         The user enters personal information
+             |First name|Last Name|Age|Phone Number|    Address         |
+             | User     |Test USer|35 | 5720000000 | 101 Constitution St|
+             | User     |Test USer|35 | 5720000000 | 101 Constitution St|
+             | User     |Test USer|35 | 5720000000 | 101 Constitution St|
+             | User     |Test USer|35 | 5720000000 | 101 Constitution St|
+
+
+         --> Then you have to use List<Map<String, String>> inside a step definition .
+
+         Key represented by column name, and value - cell value in the table.
+
+         Where to specify which data structure you want to use?
+            IN the step definitions parameters.
+
+            By default it's a DataTable.
+            But you can change it.
+
+        To keep up with new updates, read documentation or books.
+        Or watch something on lynda.com.
+
+
+        Most public library members have free access to Lynda,
+        don't spend 300 dollars to Lynda
+
+
+            @Then("following table headers should be displayed")
+            public void following_table_headers_should_be_displayed(io.cucumber.datatable.DataTable dataTable) {
+                // Write code here that turns the phrase above into concrete actions
+                // For automatic transformation, change DataTable to one of
+                // E, List<E>, List<List<E>>, List<Map<K,V>>, Map<K,V> or
+                // Map<K, List<V>>. E,K,V must be a String, Integer, Float,
+                // Double, Byte, Short, Long, BigInteger or BigDecimal.
+                //
+                // For other transformations you can register a DataTableType.
+                throw new cucumber.api.PendingException();
+            }
+
+            Developers say: it's not a bug, it's a feature.
+
+          _ Actual data all upper case. We talked to dev and ba they confirmed it should be all upper case. So our expected data was wrong.
+
+          - There was no problem with locator, list was empty because we had to wait until loading is completed and loader screen disappears. That's why before reading table headers we had to put waitUntilLoaderScreenDisappears();
+
+
+          Maven life cycle:
+        validate - validate the project is correct and all necessary information is available
+        compile - compile the source code of the project
+        test - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+        package - take the compiled code and package it in its distributable format, such as a JAR.
+        verify - run any checks on results of integration tests to ensure quality criteria are met
+        install - install the package into the local repository, for use as a dependency in other projects locally
+        deploy - done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+        mvn clean - to delete target folder (optional)
+        mvn verify - to kick off CuckesRunner and generate report
+
+        mvn test - it will run CukesRunner, but not a report. Report will be generated only at the phase verify.
+
+        Where is the report?
+        Report will be generated only if you would run: mvn verify
+
+        under target --> cucumber-html-reports
+
+
+         mvn clean verify -Dcucumber.options="--tags @calendar_events" --- to run tests from Jenkins.
+
+
+        ________Break till 3:15
+
+        “I was smiling yesterday,I am smiling today and I will smile tomorrow.Simply because life is too short to cry for anything.”
+        Santosh Kalwar, Quote Me Everyday
+
+        Erdem Denizli 3:05 PM
+        said Santosh Kalwar one day, before he decided to become an SDET
+
+        ###################################
+            Map is a data structure, that has two components: key and value.
+            Based on the key, we are getting values.
+            Keys must be unique.
+
+        What if you have too much data?
+
+         use excel/csv files.
+
+
+        package com.vytrack.step_definitions;
+
+        import com.vytrack.utilities.Pages;
+        import cucumber.api.java.en.Then;
+        import org.junit.Assert;
+
+        import java.util.List;
+        import java.util.Map;
+
+        public class VehiclesStepDefinitions {
+            Pages pages = new Pages();
+
+            @Then("user verifies that default page number is {int}")
+            public void user_verifies_that_default_page_number_is(Integer expected) {
+                Assert.assertEquals(expected, pages.vehiclesPage().getPageNumber());
+            }
+
+            @Then("user clicks on the create a car button")
+            public void user_clicks_on_the_create_a_car_button() {
+                pages.vehiclesPage().clickToCreateACar();
+            }
+
+        //            | License Plate | Cybertek |
+        //            | Driver        | Spartan  |
+        //            | Location      | Alaska   |
+        //            | Model Year    | 2019     |
+        //            | Color         | Black    |
+        //            | Power         | 500      |
+        //            | Vehicle Make  | BMW      |
+        //            | Vehicle Model | X5M      |
+
+            @Then("user enters car information:")
+            public void user_enters_car_information(Map<String, String> values) {
+                pages.vehiclesPage().enterLicensePlate(values.get("License Plate"));
+                pages.vehiclesPage().enterDriver(values.get("Driver"));
+                pages.vehiclesPage().enterLocation(values.get("Location"));
+                pages.vehiclesPage().enterModelYear(values.get("Model Year"));
+                pages.vehiclesPage().enterColor(values.get("Color"));
+                pages.vehiclesPage().enterPower(values.get("Power"));
+            }
+
+
+            @Then("user enters car information to create a car")
+            public void user_enters_car_information_to_create_a_car(List<Map<String, String>> values) {
+        //       values.get(0).get("Driver");
+        //        as many rows you have in the data table
+        //        as many maps ypu will have in the list
+        //        provide column name as key name and be happy:)
+                for(Map<String, String> value: values){
+                    pages.vehiclesPage().enterColor(value.get("Color"));
+                }
+            }
+
+            @Then("user clicks save and close")
+            public void user_clicks_save_and_close() {
+                pages.vehiclesPage().clickSaveAndClose();
+            }
+
+            @Then("user verifies that general information is displayed")
+            public void user_verifies_that_general_information_is_displayed() {
+                Assert.assertTrue(pages.vehiclesPage().verifyGeneralInformationIsDisplayed());
+            }
+        }
+
+
+
+
+        ###############################
+
+        Cucumber data tables allows you to describe data that cannot fit into one test step like Give, When, And, The etc...
+
+        It can help you to place all data under one step and read it as List, Map, or List<Map<String, String>>
+
+        Step definition contains DataTable by default as a parameter. You can change based on your need.
+
+        If you have a one column - use list
+
+        if you have key-value pair and two columns - use map
+
+        If you have real table with bunch of rows and columns - use List<Map<String, String>>
+
+        If you need to generate a report, run from command line: mvn verify
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
                 "rerun:target/rerun.txt"
         },
         tags = {"@login_with_outline_3"},
-        features = {"src/test/resources/features" //to specify where are the features
+        features = {"src/test/resources/features/topMenu" //to specify where are the features
         },
         //feature contains scenarios
         //every scenario is like a test
@@ -25,5 +25,5 @@ import org.junit.runner.RunWith;
         dryRun = false
 
 )
-public class CukesRunner {
+public class CukesRunner4 {
 }
