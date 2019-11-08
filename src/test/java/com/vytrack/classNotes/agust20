@@ -1,0 +1,204 @@
+        Agenda:
+                Today is the Last cucumber class
+                Cucumber Review
+                Framework Overview
+                BDD, DDT and TDD
+                Git flow in my project
+                My challenges
+                Parallel testing - how to do it?
+                How come you are doing parallel testing with singleton driver???
+                How come it will create one report??
+        #######################################################
+            WE DON"T DO IT, UNLESS YOU ARE DEVELOPER
+            Test Driven Development (TDD) - is a development process in which developers first write the unit tests based on requirements and then develop feature itself.
+            In short, TDD cycle is red -> green -> refactor
+            red - when tests are written based on the requirements, but still failing.
+            green - when all tests pass
+            refactor - is a phase when working code is made more readable and well structured.
+        #############################################
+            BDD (Behavior Driven Development)
+            BDD emerged and extends TDD. Instead of writing unit tests based on specifications (requirements ), why don't just make specification a test itself. That's why we write scenarios in feature file. The main idea is that BA, even PM, or anyone without technical skills, but with sufficient business knowledge can write tests.
+            To implement this we use Cucumber.
+
+            Cucumber is a BDD Framework that use Gherkin language.
+            Gherkin helps to make testing documentation sufficient.
+            It's a business readable, domain specific language that created to describe behavior without implementation.
+        #############################################################
+        How cucumber works?
+        We have feature files
+        We have Step Definitions
+        We have a Runner class
+        We have a Hook  (optional)
+        feature file --> runner --> step definitions
+        One feature file stands fro testing one product feature.
+        In the feature file we write scenarios. Every scenario is a test. Every scenario phrase starts from gherkin keyword followed by any text:
+            Given
+            When
+            Then
+            And
+            But
+        Every phrase is like a test step.
+        If you put When instead of Then or Given - no problem(in terms of code, cucumber doesn't care)
+        given->preconditions are mentioned in this keyword     When -> the purpose of this step is to describe the user action  Then -> to observe the expected output. actions can follows each other with And keyword
+        Also in Gherkin, we have: Feature, Scenario, Scenario Outline, Examples, Background
+        What the difference between Scenario and Scenario Outline?
+        Scenario runs only once
+        Scenario Outline - has Examples table, and runs as many times, as many rows (except first row) you have in Examples table. It helps to handle cases, when you have exactly same tests steps but with different values. We use scenario Outline to perform DDT(same test but different data set).  Examples table provides test data for scenario outline. Column names should match variables in the <brackets>
+        Scenario Outline: Login
+            Given user logs in as a "<user>"
+        Examples: User info
+            |  user       |
+            |sales manager|
+            |store manager|
+        ##################################################
+        Runner class: Cucumber requires runners to execute scenarios. You can configure Runner class with JUnit or TestNG. IN our framework we use JUnit.
+        @RunWith(Cucumber.class) - without this step cucumber will not work. It should go on top of runner class, not inside.
+        JUnit acts as a bridge between  step definition file  and feature file. Junit runs scenario as a test.
+        Also, don't forget to configure runner!
+        IT's done through:
+        @CucumberOptions(
+                plugin = {
+                        "json:target/cucumber.json",
+                        "html:target/default-cucumber-reports",
+                        "rerun:target/rerun.txt"
+                },
+                tags = {"@negative or @storemanager"},
+                features = {"src/test/resources/features" //to specify where are the features
+                },
+                //feature contains scenarios
+                //every scenario is like a test
+                //where is the implementation for features
+                glue = {"com/vytrack/step_definitions"},
+                //dry run - to generate step definitions automatically
+                //you will see them in the console output
+                dryRun = false
+        )
+        @RunWith coming from Junit,
+        @CucumberOptions coming from Cucumber, this might be interview question, that is what our mentor said
+        Why do we need it?
+            First: to specify path to the features
+            features = {"src/test/resources/features"}
+            Second: To specify path to the step definitions
+            glue = {"com/vytrack/step_definitions"},
+             tags = {"@negative or @storemanager"},
+             Role of tags is to select specific feature/scenarios to run and ignore others.
+              plugin = {
+                        "json:target/cucumber.json",
+                        "html:target/default-cucumber-reports",
+                        "rerun:target/rerun.txt"
+                },
+                Plugin helps us to generate:
+                 default html report
+                 json report that will be used by maven-cucumber html report
+                 rerun txt file - that contains list of scenarios tha failed in previous run.
+                 also we can generate junit report
+                 pretty report
+                 Very important cucumber option is a dryRun.
+                 dryRun allows you to generate unimplemented step definitions.
+                 dryRun = true - will not run tests, it will only check if all scenarios that you are trying to run have step definitions.
+                  dryRun = false | just to kick off tests
+        #############################
+        Step Definitions - contains code implementation of cucumber test steps.
+            Step def:
+            @Then("user logs in as a store manager")
+            public void user_logs_in_as_a_store_manager() {
+            }
+            test step from scenario:
+             Then user logs in as a store manager
+             Cucumber allows to reuse step definitions across project.
+        ###############################################################
+        Tell me about your framework?
+            In my current project, I am working on VyTrack application.
+            We use Hybrid framework. Because our framework is a combination of BDD testing framework (sometimes people BDT), DDT and (Modular)Page Object Model frameworks.
+            (NO TEST DRIVEN DEVELOPMENT!!!!)
+            Hybrid is 2 or more frameworks together
+            Our framework is built with Maven. Maven is a build automation and project management tool. Maven is used to build our framework, manage dependencies and plugins, run tests as a maven lifecycle.
+            We use Java as a programming language.
+            We use Cucumber BDD: To make tests understandable for non-technical people(team members). Cucumber works a bridge between SDETs and non technical team members. With cucumber, we write test scenarios from end-user perspective. As of now, we are using Cucumber 4.
+            We use Junit (unit testing tool) - it helps to kick off cucumber tests.
+            We use Selenium Webdriver for developing test automation scripts.
+            My framework generates nice HTML step-by-step report regarding test results with maven cucumber reporting plugin.
+            <plugin>
+                        <groupId>net.masterthought</groupId>
+                        <artifactId>maven-cucumber-reporting</artifactId>
+                        <version>4.8.0</version>
+                        <executions>
+                            <execution>
+                                <id>execution</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>generate</goal>
+                                </goals>
+                                <configuration>
+                                    <projectName>Cucumber HTML Reports</projectName>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <inputDirectory>${project.build.directory}</inputDirectory>
+                                    <jsonFiles>
+                                        <param>**/cucumber.json</param>
+                                    </jsonFiles>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+            Our framework supports DDT (Data Driven Testing). Cucumber natively supports DDT by using Scenario Outline. Also, we do data driven testing by reading data from excel files.
+            Our project is based on Page Object Model. Based on POM we create a separate page class for every page of our application. Page class works as a webelements  repository.
+            We use singleton driver that allows us to use same webdriver instance across entire project.
+            We use properties file to store configuration information like: urls, jdbc/api connections strings, credentials etc.
+            As IDE, I use Intellij IDEA, but I am also good with Eclipse.
+            In our framework, we perform UI, back-end and API Testing.
+            UI - selenium webdriver
+            DataBase - JDBC
+            API - Rest Assured library
+            What kind of testing we do?
+            functional, smoke, regression, integration, acceptance testing.
+            We use Jenkins to schedule smoke and regression test. Also, it Jenkins sends email notification with HTML report once execution is completed. With Xray plugin we can automatically update test results on Jira.
+            We use Log4j api to log information(errors, some test steps, etc.)
+            We use Selenium Grid to perform remote and parallel execution.
+            (WE DON'T USE SELENIUM IDE/RC)
+            We have utilities package where we store Driver class, BrowserUtils, ConfigurationReader, DBUTils, ExeclUtils, APIUtils...
+            we create packages for runners, page classes, step definitions, utilities
+            Parallel execution - it's when you run couple tests at the same time. We use maven-surefire-plugin to achieve parallel execution.
+            Test Data ---> coming from cucumber feature files and excel files. Also you can use csv or json files.
+        ####################################
+
+            How we run tests?
+            From runner class
+            or from terminal: mvn clean verify
+        ########################################
+            GIT
+            Let's say 2 automation tests in the team. (You and your test lead)
+            So you should have couple branches:
+            master
+            tester1
+            tester2
+            Me and my automation buddy have separate branches. Main code is on master branch. Whenever I finish development of automation scripts for some user story, I commit and push my code to my branch, then I create a pull request in order to merge my changes with master branch. Pull request will be reviewed by other automation tester(test lead). Also, I move my jira task from IN Progress to Review. Once review completed, jira issue (ticket) will be closed, and pull request will be closed. Changes from by branch will be copied to the master branch. Same with every SDET. Code must be reviewed before merging with master branch.
+        (Alternative for maven is a Gradle)
+        Are we supposed to know which version of tools we use in our framework  in interview?
+         - yes, people ask about versions.
+        Framework provide to the SDET various benefits that help do develop test automation scripts.Test automation framework use different concepts, practices coding standard to achieve ease of scripting,scalability,modularity, re-usability, maintenance.
+        @Vasyl  what was your role in your project? what should we say? Do not forget this Question.
+            In my team, we had 2 automation testers, 1 BA, 1 SM, 1 PM, 1 manual tester.
+            4 developers.
+            My role was to automate tests. When I joined a project, automation framework was already set. My main responsibility was to develop automation for regression suite. Since project was very long, (from 15 - to 20 years). And when I joined a project, automation framework has been in the development for about 6 month.
+            My challenges:
+                because of huge gap between automation start date and development  start date, plus transfer from waterfall to agile - I had lack of documentation.
+                Since we used cucumber framework, we had to write test from end-user perspective. Even for features that were development in waterfall environment. Since format of old requirements is completely  different from agile stories, I had to convert it.
+            Automation with IE.
+                When I joined this project, all locators used only xpath. Since xpath works very slow in IE, I had to convert all locators, that was possible, into css.
+            Performance issue: regression took too long. Before i joined a project, it was around 30 hours with IE. Then we implemented parallel execution with selenium grid and successfully reduced execution time to 5 hours. For this, we used 3 virtual machines and maven-surefire-plugin to be able to run multiple runners at the same time.
+            Another challenge:
+                Difficult to make any changes. Change report, add new libraries, implement  some new design pattern - always no.
+        Vasyl, in Automation, Jira tickets is not automatically closed  right. we need to do it manually even though the execution is automatic ?
+        - manually, by hands.
+        #######################Additional  CHALLENGES:
+        1. inherited a difficult framework --> the framework was written by a tester who used to be manual tester. the framework was poorly designed. did not used page object model, was not properly packaged, did not use single naming convention, same logic was repeated in different places, it was hard to change something without affecting other tests, reusing code was also hard.
+        the option was to create a new framework or refactor the same one. when the issue was brought up to the team, pointed out the flows of the framework and made suggestions on how it can be improved. based on the my suggestions team decided to keep the old by but re write based on page object model, create many utilities to make code easy to reuse.
+        2. i had a couple form in my project which had fields with validations. every time when i entered a ext to a field and moved to next field, application validates the previous field. but my app worked in a way that, when it validate something, it reloaded the whole form.
+        I had to use combination of implicit wait, explicit wait, waiting for background JS process to end, clicking using JS, clicking outside the field and thread sleep.
+        3. coordinating functionalities which conflicted with other tests when running in parallel --> i had configuration related tests, and they affected the other tests. because when i run the confutation tests, it changes the view of the application across the board.
+        1. I talked to the team and removed less priority configuration tests from the regression suite.
+        2. i organized the tests in a way the configuration tests was running after everything
+        4. IE issues: xpath works really slow in ie, for certain elements it takes time to execute sendkeys command --> use css where possible, use javascript to sendkeys to certain elements.
+        5. setting up test data
+        6. test coverage, rtm, and updating jira. for this we had to buy a new plugin -Xray for our jira. using xray we can update jira with the test result every time when we run smoke test from jenkins.
+        7. file upload did not work with selenium,, had to use AUtoIT to upload using the upload button. using autoit, managed to click on the native os window

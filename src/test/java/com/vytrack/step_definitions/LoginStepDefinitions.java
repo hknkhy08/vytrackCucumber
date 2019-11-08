@@ -8,6 +8,8 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 
+import java.util.Map;
+
 public class LoginStepDefinitions {
 
     Pages pages = new Pages();
@@ -55,6 +57,13 @@ public class LoginStepDefinitions {
     @When("user logs in as a {string}")
     public void user_logs_in_as_a(String role) {
         pages.loginPage().login(role);
+    }
+
+
+    @Given("user logs in with following credentials")
+    public void user_logs_in_with_following_credentials(Map<String, String> values) {
+        pages.loginPage().login(values.get("username"), values.get("password"));
+
     }
 
 }
